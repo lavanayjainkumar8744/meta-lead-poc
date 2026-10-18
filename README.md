@@ -1,54 +1,40 @@
-# Meta Lead Ads - Real-Time React Native PoC
+# Meta Lead Ads + React Native PoC
 
-A proof of concept showing real-time lead updates in a React Native app when a lead ad form is submitted on Meta, without any manual action or refreshing on the device.
+A simple project to show Meta Lead Ad submissions appearing live on a React Native app screen without refreshing or touching the device.
 
-## How It Works
+### How it works
+- When a lead is submitted in Meta's Lead Testing Tool, Meta sends a webhook POST request to our backend.
+- The Express backend receives the lead data and sends it to the mobile app using Socket.io.
+- The React Native app receives the socket event and updates the list on the screen automatically.
+- Ngrok is used to connect Meta's webhook to localhost:3000 during local development.
 
-1. **Meta Webhook (`GET /webhook`):** Verifies the webhook subscription with Meta's developer platform using a secret token.
-2. **Lead Ingestion (`POST /webhook`):** Receives lead notifications from Meta whenever a user submits a test lead form.
-3. **Socket.io Broadcasting:** The backend pushes the incoming lead payload to connected mobile clients in real-time.
-4. **React Native Client:** Listens on the WebSocket connection and immediately updates the state to show the lead card on the screen.
+### Tech Stack
+- **Backend:** Node.js, Express, Socket.io
+- **Mobile:** React Native (Expo), Socket.io Client
+- **Tunnel:** Ngrok
 
-```
-Meta Lead Testing Tool
-         │
-         ▼ (HTTP POST Webhook)
-    Ngrok Tunnel
-         │
-         ▼
-Node.js Express Backend
-         │
-         ▼ (Socket.io Event: 'lead_received')
-React Native Mobile App (Auto-renders lead card)
-```
+### How to run
 
-## Running Locally
+1. **Start the backend:**
+   ```bash
+   cd backend
+   npm install
+   node index.js
+   ```
 
-### 1. Backend Server
-```bash
-cd backend
-npm install
-node index.js
-```
-Server runs on `http://localhost:3000`.
+2. **Start Ngrok (in a separate terminal):**
+   ```bash
+   ngrok http 3000
+   ```
+   Add the generated forwarding URL in your Meta Developer App under Webhooks (`/webhook`) with verify token `my_unque_secret_token`.
 
-### 2. Ngrok Tunnel
-Expose local port 3000 to the internet:
-```bash
-ngrok http 3000
-```
-Use the generated HTTPS URL to configure the Webhook URL in Meta App Dashboard (`/webhook`).
+3. **Start the mobile app:**
+   ```bash
+   cd mobile-app
+   npm install
+   npx expo start
+   ```
+   Scan the QR code with Expo Go on your phone.
 
-### 3. Mobile App
-```bash
-cd mobile-app
-npm install
-npx expo start
-```
-Scan the QR code with Expo Go on Android or iOS.
-
-## Testing with Meta Lead Ads Tool
-1. Go to [Meta Lead Ads Testing Tool](https://developers.facebook.com/tools/lead-ads-testing).
-2. Choose your Page and Lead Form.
-3. Click **Create Lead**.
-4. The lead will appear automatically on the mobile screen without touching the phone.
+### Testing
+Open Meta's Lead Ads Testing Tool, select your Page and Form, and click **Create Lead**. The new lead will show up on your phone screen immediately.
