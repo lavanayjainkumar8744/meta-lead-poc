@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, StatusBar } from 'react-native';
 import { io } from 'socket.io-client';
 
-// Public Ngrok tunnel pointing to local backend
 const BACKEND_URL = 'https://crested-haunt-unveiling.ngrok-free.dev';
 
 export default function App() {
@@ -10,7 +9,6 @@ export default function App() {
   const [status, setStatus] = useState('Connecting...');
 
   useEffect(() => {
-    // initialize socket connection
     const socket = io(BACKEND_URL, {
       transports: ['websocket'],
       extraHeaders: {
@@ -19,19 +17,18 @@ export default function App() {
     });
 
     socket.on('connect', () => {
-      console.log('Connected to WebSocket server');
+      console.log('Socket connected');
       setStatus('Connected');
     });
 
     socket.on('disconnect', () => {
-      console.log('Disconnected from WebSocket server');
+      console.log('Socket disconnected');
       setStatus('Disconnected');
     });
 
-    // listen for incoming leads pushed by backend
     socket.on('lead_received', (newLead) => {
-      console.log('Incoming lead received:', newLead);
-      setLeads((currentLeads) => [newLead, ...currentLeads]);
+      console.log('New lead event:', newLead);
+      setLeads((current) => [newLead, ...current]);
     });
 
     return () => {
@@ -40,31 +37,31 @@ export default function App() {
   }, []);
 
   const renderLeadCard = ({ item, index }) => {
-    const leadValue = item.value || {};
-    const createdDate = leadValue.created_time
-      ? new Date(leadValue.created_time * 1000).toLocaleTimeString()
+    const lead = item.value || {};
+    const formattedTime = lead.created_time
+      ? new Date(lead.created_time * 1000).toLocaleTimeString()
       : new Date().toLocaleTimeString();
 
     return (
       <View style={styles.leadCard}>
         <View style={styles.cardHeader}>
           <Text style={styles.badgeText}>Lead #{leads.length - index}</Text>
-          <Text style={styles.timeText}>{createdDate}</Text>
+          <Text style={styles.timeText}>{formattedTime}</Text>
         </View>
 
         <View style={styles.cardRow}>
           <Text style={styles.label}>Lead ID:</Text>
-          <Text style={styles.value}>{leadValue.leadgen_id || leadValue.ad_id || 'Test Lead'}</Text>
+          <Text style={styles.value}>{lead.leadgen_id || lead.ad_id || 'Test Lead'}</Text>
         </View>
 
         <View style={styles.cardRow}>
           <Text style={styles.label}>Form ID:</Text>
-          <Text style={styles.value}>{leadValue.form_id || 'N/A'}</Text>
+          <Text style={styles.value}>{lead.form_id || 'N/A'}</Text>
         </View>
 
         <View style={styles.cardRow}>
           <Text style={styles.label}>Page ID:</Text>
-          <Text style={styles.value}>{leadValue.page_id || 'N/A'}</Text>
+          <Text style={styles.value}>{lead.page_id || 'N/A'}</Text>
         </View>
       </View>
     );
@@ -73,8 +70,7 @@ export default function App() {
   return (
     <View style={styles.screen}>
       <StatusBar barStyle="dark-content" />
-      
-      {/* Header bar */}
+
       <View style={styles.header}>
         <Text style={styles.title}>Meta Lead Ads Live</Text>
         <View style={styles.statusRow}>
@@ -88,7 +84,6 @@ export default function App() {
         </View>
       </View>
 
-      {/* Leads list or empty state */}
       <View style={styles.contentContainer}>
         {leads.length === 0 ? (
           <View style={styles.emptyState}>
