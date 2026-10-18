@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, FlatList, StatusBar } from 'react-native';
 import { io } from 'socket.io-client';
 
 // Public Ngrok tunnel pointing to local backend
@@ -71,7 +71,7 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <View style={styles.screen}>
       <StatusBar barStyle="dark-content" />
       
       {/* Header bar */}
@@ -106,7 +106,7 @@ export default function App() {
           />
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
