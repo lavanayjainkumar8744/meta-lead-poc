@@ -18,7 +18,6 @@ app.use(express.json());
 
 const VERIFY_TOKEN = 'my_unque_secret_token';
 
-// Webhook verification endpoint for Meta
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -37,7 +36,6 @@ app.get('/webhook', (req, res) => {
   res.sendStatus(400);
 });
 
-// Incoming lead payload receiver
 app.post('/webhook', (req, res) => {
   const data = req.body;
 
